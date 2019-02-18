@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Webcam motion detection</title>
+        <link rel="stylesheet" type="text/css" href="styles/main.css" media="all">
+    </head>
+    <body>
+        <table id="panel" class="table table-hover table-bordered">
+            <tr>
+                <td><h1></h1></td>
+                <td><h1>Modec A (Maze)</h1></td>
+                <td><h1>Modec B (Garden)</h1></td>
+            </tr>
+            <tr>
+                <td><h1>Feed</h1></td>
+                <td>
+                    <video id="webCamA" autoplay></video>
+                    <div id="movementA"></div>
+                </td>
+                <td>B</td>
+            </tr>
+            <tr>
+                <td><h1>Status</h1></td>
+                <td><h2 id="modec-A-status" style="color: red;">NOT running</h2></td>
+                <td><h2 id="modec-B-status" style="color: red;">NOT running</h2></td>
+            </tr>
+            <tr>
+                <td><h1>Controls</h1></td>
+                <td>
+                    <input type="button" value="START Motion Detection" onclick="armMoDec('A');">
+                    <input type="button" value="STOP Motion Detection" onclick="disarmMoDec('A');">
+                </td>
+                <td>
+                    <input type="button" value="START Motion Detection" onclick="armMoDec('B');">
+                    <input type="button" value="STOP Motion Detection" onclick="disarmMoDec('B');">
+                </td>
+            </tr>
+        </table>
+
+        <!--
+        <div class="row">
+            <div class="col-md-6">
+            <h1>MoDec A Feed</h1>
+            </div>
+        </div>
+        <div class="row">
+            <video id="webCamWindow" autoplay></video>
+            <div id="movement"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Status: NOT running</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <input type="button" name="vehicle1" value="Start Motion Detection" onclick="armMoDec();">
+            </div>
+            <div class="col-md-2">
+                <input type="button" name="vehicle1" value="Emergency Stop">
+            </div>
+        </div>
+        -->
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <script src="https://cdn.rawgit.com/mohayonao/web-audio-api-shim/master/build/web-audio-api-shim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
+        <script type="text/javascript" src="js/global.js"></script>
+        <script type="text/javascript" src="js/MotionDetector/WebCamCapture.js"></script>
+        <script type="text/javascript" src="js/MotionDetector/ImageCompare.js"></script>
+        <script type="text/javascript" src="js/MotionDetector/Core.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+    </body>
+</html>

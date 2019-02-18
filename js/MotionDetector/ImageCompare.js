@@ -71,6 +71,7 @@
 
 			temp1Context.drawImage(image1, 0, 0, width, height);
 			temp2Context.drawImage(image2, 0, 0, width, height);
+            modecATriggered= false;
 
 			for(var y = 0; y < height; y++) {
 				for(var x = 0; x <  width; x++) {
@@ -88,6 +89,8 @@
 				}
 			}
             if (modecATriggered) {
+                // when triggered,
+                console.log("triggered");
             }
 
 			return {

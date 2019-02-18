@@ -1,14 +1,3 @@
-/**
- *
- * @project        Motion Detection in JS
- * @file           ImageCompare.js
- * @description    Core functionality.
- * @author         Benjamin Horn
- * @package        MotionDetector
- * @version        -
- * 
- */
-
 ;(function(App) {
 
 	"use strict";
@@ -45,7 +34,7 @@
 		 * @return void.
 		 */
 		function initialize() {
-			imageCompare = new App.ImageCompare(/* sensitvity */ 160);
+			imageCompare = new App.ImageCompare(/* sensitvity */ 40);
 			webCam = new App.WebCamCapture(document.getElementById('webCamA'));
 
 			main();

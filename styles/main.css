@@ -1,14 +1,31 @@
-#movement {
-    position: relative;
+#movementA {
+    display: inline;
+    position: absolute;
     top: 0;
     left: 0;
     border: 1px solid red;
     background: rgba(255,0,0,0.3);
 }
 
-#panel td 
-{
-    text-align: center; 
-    vertical-align: middle;
+#canvas {
+    position: absolute;
+    opacity: 1;
+    top: 0;
+    left: 0;
+    width: 640px;
+    height:  480px;
 }
 
+input[type="button"] {
+}
+
+.running{
+    animation:blinkingText 2s infinite;
+}
+@keyframes blinkingText{
+    10%{    color: green;    }
+    49%{    color: green; }
+    50%{    color: green; }
+    99%{    color: transparent;  }
+    100%{   color: green;    }
+}

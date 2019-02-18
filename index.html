@@ -5,6 +5,12 @@
         <link rel="stylesheet" type="text/css" href="styles/main.css" media="all">
     </head>
     <body>
+        <input id="init" type="button" class="btn btn-danger" value="Initialize" onclick="initialize();">
+
+        <br>
+        <br>
+
+        <h1>Motion Detector Panel</h1>
         <table id="panel" class="table table-hover table-bordered">
             <tr>
                 <td><h1></h1></td>
@@ -13,11 +19,13 @@
             </tr>
             <tr>
                 <td><h1>Feed</h1></td>
-                <td>
+                <td style="position:relative;">
                     <video id="webCamA" autoplay></video>
                     <div id="movementA"></div>
                 </td>
-                <td>B</td>
+                <td>
+                    <h1>B</h1>
+                </td>
             </tr>
             <tr>
                 <td><h1>Status</h1></td>
@@ -27,12 +35,55 @@
             <tr>
                 <td><h1>Controls</h1></td>
                 <td>
-                    <input type="button" value="START Motion Detection" onclick="armMoDec('A');">
-                    <input type="button" value="STOP Motion Detection" onclick="disarmMoDec('A');">
+                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('A');">
+                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('A');">
                 </td>
                 <td>
-                    <input type="button" value="START Motion Detection" onclick="armMoDec('B');">
-                    <input type="button" value="STOP Motion Detection" onclick="disarmMoDec('B');">
+                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('B');">
+                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('B');">
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <br>
+        <h1>Narrative Panel</h1>
+
+        <table id="panel" class="table table-hover table-bordered">
+            <tr>
+                <td><h4>STAGE</h4></td>
+                <td><h4>0: No visitor</h4></td>
+                <td><h4>1: Visitor enters MAZE, track fades in</h4></td>
+                <td><h4>2: Visitor enters GARDEN, pluck fades out</h4></td>
+                <td><h4>3: Visitor EXITS, drone fades out</h4></td>
+            </tr>
+            <tr>
+                <td><h4>Event triggered</h4></td>
+                <td class="bg-success" id="0_triggered"><h4>✔</h4></td>
+                <td id="1_triggered"><h4>✔</h4></td>
+                <td id="2_triggered"><h4>✔</h4></td>
+                <td id="3_triggered"><h4>✔</h4></td>
+            </tr>
+            <tr>
+                <td><h4>Event Complete</h4></td>
+                <td id="0_complete"><h4>✔</h4></td>
+                <td id="1_complete"><h4>✔</h4></td>
+                <td id="2_complete"><h4>✔</h4></td>
+                <td id="3_complete"><h4>✔</h4></td>
+            </tr>
+            <tr>
+                <td><h4>Manual Triggers</h4></td>
+                <td id="0_manual">
+                    <input type="button" class="btn btn-danger" value="RESET" onclick="narrativeCore.reset();">
+                </td>
+                <td id="1_manual">
+                    <input type="button" class="btn btn-warning" value="TRIGGER" onclick="narrativeCore.enterMaze();">
+                </td>
+                <td id="2_manual">
+                    <input type="button" class="btn btn-warning" value="TRIGGER">
+                </td>
+                <td id="3_manual">
+                    <input type="button" class="btn btn-warning" value="TRIGGER">
                 </td>
             </tr>
         </table>
@@ -66,6 +117,7 @@
         <script src="https://cdn.rawgit.com/mohayonao/web-audio-api-shim/master/build/web-audio-api-shim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
         <script type="text/javascript" src="js/global.js"></script>
+        <script type="text/javascript" src="js/Narrative/Core.js"></script>
         <script type="text/javascript" src="js/MotionDetector/WebCamCapture.js"></script>
         <script type="text/javascript" src="js/MotionDetector/ImageCompare.js"></script>
         <script type="text/javascript" src="js/MotionDetector/Core.js"></script>

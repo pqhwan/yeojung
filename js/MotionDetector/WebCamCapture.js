@@ -10,138 +10,164 @@
  */
 
 ;(function(App) {
-	
-	"use strict";
-	
-	/*
-	 * Creates a new web cam capture.
-	 *
-	 * @param <Element> videoElement The video element where we want to stream the footage.
-	 *
-	 * @return <Object> The initalized object.
-	 *
-	 */
-	App.WebCamCapture = function(videoElement) {
 
-		var webCamWindow = false;
-		var width = 640;
-		var height = 480;
+    "use strict";
 
-		/*
-		 * Initializes the object.
-		 *
-		 * @param <Element> videoElement The video element where we want to stream the footage.
-		 *
-		 * @return void.
-		 *
-		 */
-		function initialize(videoElement) {
-			if(typeof videoElement != 'object') {
-				webCamWindow = document.getElementById(videoElement);
-			} else {
-				webCamWindow = videoElement;
-			}
+    /*
+     * Creates a new web cam capture.
+     *
+     * @param <Element> videoElement The video element where we want to stream the footage.
+     *
+     * @return <Object> The initalized object.
+     *
+     */
+    App.WebCamCapture = function(videoElement, deviceName) {
 
-			if(hasSupport()) {
-				if(webCamWindow) {
-					webCamWindow.style.width = width + 'px';
-					webCamWindow.style.height = height + 'px';
-					startStream();
-				}
-				
-			} else {
-				alert('No support found');
-			}
-		}
+        var webCamWindow = false;
+        var width = 640;
+        var height = 480;
 
-		/*
-		 * Starts the streaming from the webcamera to the video element.
-		 *
-		 * @return void.
-		 *
-		 */
-		function startStream() {
-			(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia).call(
-				navigator, 
-				{video: true}, 
-				function(localMediaStream) {
-					if(webCamWindow) {
-						var vendorURL = window.URL || window.webkitURL;
+        /*
+         * Initializes the object.
+         *
+         * @param <Element> videoElement The video element where we want to stream the footage.
+         *
+         * @return void.
+         *
+         */
+        function initialize(videoElement) {
+            if(typeof videoElement != 'object') {
+                webCamWindow = document.getElementById(videoElement);
+            } else {
+                webCamWindow = videoElement;
+            }
 
-						if (navigator.mozGetUserMedia) {
-							webCamWindow.mozSrcObject = localMediaStream;
-							webCamWindow.play();
-						} else {
-							try {
-								webCamWindow.srcObject = localMediaStream;
-							} catch (error) {
-								webCamWindow.src = vendorURL.createObjectURL(localMediaStream);
-							}
-						}
-					}
-				}, 
-				console.error
-			);
-		}
+            if(hasSupport()) {
+                if(webCamWindow) {
+                    webCamWindow.style.width = width + 'px';
+                    webCamWindow.style.height = height + 'px';
+                    startStream();
+                }
 
-		/*
-		 * Captures a still image from the video.
-		 *
-		 * @param <Element> append An optional element where we want to append the image. 
-		 *
-		 * @return <Element> A canvas element with the image.
-		 *
-		 */
-		function captureImage(append) {
-			var canvas = document.createElement('canvas');
-			canvas.width = width;
-			canvas.height = height;
-			canvas.getContext('2d').drawImage(webCamWindow, 0, 0, width, height);
+            } else {
+                alert('No support found');
+            }
+        }
 
-			var pngImage = canvas.toDataURL("image/png"); 
-			
-			if(append) {
-				append.appendChild(canvas);	
-			}
+        /*
+         * Starts the streaming from the webcamera to the video element.
+         *
+         * @return void.
+         *
+         */
+        function startStream() {
+            /*
+            navigator.mediaDevices.enumerateDevices().then(function(mediaDevices) {
+                mediaDevices.forEach(mediaDevice => {
+                    if (mediaDevice.label == deviceName) {
+                        console.log(mediaDevice);
+                        if (webCamWindow) {
+                            var vendorURL = window.URL || window.webkitURL;
 
-			return canvas;
-		}
+                            if (navigator.mozGetUserMedia) {
+                                webCamWindow.mozSrcObject = mediaDevice;
+                                webCamWindow.play();
+                            } else {
+                                try {
+                                    webCamWindow.srcObject = mediaDevice;
+                                } catch (error) {
+                                    webCamWindow.src = vendorURL.createObjectURL(mediaDevice);
+                                }
+                            }
+                        }
+                    }
+                });
+            }); */
 
-		/*
-		 * Sets the size of the video
-		 *
-		 * @param <Int> w The width.
-		 * @param <Int> h The height.
-		 *
-		 * @return void.
-		 *
-		 */
-		function setSize(w, h) {
-			width = w;
-			height = h;
-		}
+            (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia).call(
+                    navigator, 
+                    {video: true}, 
+                    function(localMediaStream) {
+                        if (webCamWindow) {
+                            var vendorURL = window.URL || window.webkitURL;
+                            var videoTracks = localMediaStream.getVideoTracks();
+                            console.log(deviceName);
+                            if (videoTracks[0].label == deviceName)  {
+                                console.log("match");
+                                if (navigator.mozGetUserMedia) {
+                                    webCamWindow.mozSrcObject = localMediaStream;
+                                    webCamWindow.play();
+                                } else {
+                                    try {
+                                        webCamWindow.srcObject = localMediaStream;
+                                    } catch (error) {
+                                        webCamWindow.src = vendorURL.createObjectURL(localMediaStream);
+                                    }
+                                }
+                            }
+                        }
+                    }, 
+                    console.error);
+        }
 
-		/*
-		 * Checks if the browser supports webcam interfacing.
-		 *
-		 * @return <Boolean>.
-		 *
-		 */
-		function hasSupport(){
-			return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
-				navigator.mozGetUserMedia || navigator.msGetUserMedia);
-		}
+        /*
+         * Captures a still image from the video.
+         *
+         * @param <Element> append An optional element where we want to append the image. 
+         *
+         * @return <Element> A canvas element with the image.
+         *
+         */
+        function captureImage(append) {
+            var canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext('2d').drawImage(webCamWindow, 0, 0, width, height);
 
-		// Initialize on creation.
-		initialize(videoElement);
+            var pngImage = canvas.toDataURL("image/png"); 
 
-		// Return public interface.
-		return {
-			setSize: setSize,
-			hasSupport: hasSupport,
-			captureImage: captureImage
-		};
+            if(append) {
+                append.appendChild(canvas);	
+            }
 
-	}
+            return canvas;
+        }
+
+        /*
+         * Sets the size of the video
+         *
+         * @param <Int> w The width.
+         * @param <Int> h The height.
+         *
+         * @return void.
+         *
+         */
+        function setSize(w, h) {
+            width = w;
+            height = h;
+        }
+
+        /*
+         * Checks if the browser supports webcam interfacing.
+         *
+         * @return <Boolean>.
+         *
+         */
+        function hasSupport(){
+            return !!(navigator.getUserMedia || navigator.webkitGetUserMedia ||
+                    navigator.mozGetUserMedia || navigator.msGetUserMedia);
+        }
+
+        // Initialize on creation.
+        initialize(videoElement);
+
+        // Return public interface.
+        return {
+            setSize: setSize,
+            hasSupport: hasSupport,
+            captureImage: captureImage
+        };
+
+    }
 
 })(MotionDetector);

@@ -7,6 +7,15 @@
     background: rgba(255,0,0,0.3);
 }
 
+#movementB {
+    display: inline;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 1px solid blue;
+    background: rgba(0,0,250,0.3);
+}
+
 #canvas {
     position: absolute;
     opacity: 1;

@@ -7,7 +7,8 @@
 	 *
 	 * @return <Object> The initalized object.
 	 */
-	App.Core = function() {
+	App.Core = function(which, deviceName, defaultSensitivity, eventFunc) {
+
         var moDecArmed = false;
 
 		var width = 64;
@@ -22,6 +23,8 @@
 		var topLeft = [Infinity,Infinity];
 		var bottomRight = [0,0];
 
+        var flushTimer;
+
 		var raf = (function(){
 			return  window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
 			function( callback ){ // not called in chrome
@@ -33,9 +36,9 @@
 		 * Initializes the object.
 		 * @return void.
 		 */
-		function initialize() {
-			imageCompare = new App.ImageCompare(/* sensitvity */ 40);
-			webCam = new App.WebCamCapture(document.getElementById('webCamA'));
+		function initialize(which) {
+			imageCompare = new App.ImageCompare(defaultSensitivity, which, eventFunc);
+			webCam = new App.WebCamCapture(document.getElementById('webCam' + which), deviceName);
 
 			main();
 		}
@@ -46,7 +49,7 @@
 		 *
 		 * @return void.
 		 */
-		function render() {
+		function render(which) {
 			oldImage = currentImage;
 			currentImage = webCam.captureImage(false);
 
@@ -54,22 +57,21 @@
 				return;
 			}
 
-            // TODO should also return whether motion was detected. 
 			var vals = imageCompare.compare(currentImage, oldImage, width, height);
-            drawMovement(vals);
+            drawMovement(which, vals);
 		}
 
-        function drawMovement(vals) {
+        function drawMovement(which, vals) {
 			topLeft[0] = vals.topLeft[0] * 10;
 			topLeft[1] = vals.topLeft[1] * 10;
 
 			bottomRight[0] = vals.bottomRight[0] * 10;
 			bottomRight[1] = vals.bottomRight[1] * 10;
 
-			document.getElementById('movementA').style.top = topLeft[1] + 'px';
-			document.getElementById('movementA').style.left = topLeft[0] + 'px';
-			document.getElementById('movementA').style.width = (bottomRight[0] - topLeft[0]) + 'px';
-			document.getElementById('movementA').style.height = (bottomRight[1] - topLeft[1]) + 'px';
+			document.getElementById('movement' + which).style.top = topLeft[1] + 'px';
+			document.getElementById('movement' + which).style.left = topLeft[0] + 'px';
+			document.getElementById('movement' + which).style.width = (bottomRight[0] - topLeft[0]) + 'px';
+			document.getElementById('movement' + which).style.height = (bottomRight[1] - topLeft[1]) + 'px';
 
 			topLeft = [Infinity,Infinity];
 			bottomRight = [0,0]
@@ -84,7 +86,7 @@
 		function main() {
 			try {
                 if (moDecArmed) {
-                    render();
+                    render(which);
                 }
 			} catch(e) {
 				console.log(e);
@@ -97,17 +99,26 @@
 		}
 
         function armMoDec() {
+            flushTimer = setInterval(imageCompare.triggerFlush, 2500);
             moDecArmed = true;
         }
 
         function disarmMoDec() {
+            if (flushTimer)  {
+                clearInterval(flushTimer); 
+            }
+            document.getElementById("modec-" + which + "-activity").textContent = "NOT measuring";
             moDecArmed = false;
         }
 
-		initialize();
+        function setSensitivity(val) {
+            imageCompare.setSensitivity(val); 
+        }
+		initialize(which);
 		return {
 			armMoDec: armMoDec,
-			disarmMoDec: disarmMoDec
+			disarmMoDec: disarmMoDec,
+            setSensitivity: setSensitivity
 		}
 	};
 })(MotionDetector);

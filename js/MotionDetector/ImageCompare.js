@@ -20,10 +20,11 @@
 	 * @return <Object> The initalized object.
 	 *
 	 */
-	App.ImageCompare = function(sensitivity) {
+	App.ImageCompare = function(defaultSensitivity, name, eventFunc) {
 		var temp1Canvas, temp1Context, temp2Canvas, temp2Context, topLeft, bottomRight;
+		var sensitivity = defaultSensitivity;
 
-        var modecATriggered = false; 
+        var triggerCount = 0; 
 
 		/*
 		 * Initializes the object.
@@ -48,6 +49,18 @@
 			bottomRight = [0,0];
 		}
 
+        function setSensitivity(val) {
+            sensitivity = val; 
+        }
+
+        function triggerFlush() {
+            document.getElementById("modec-" + name + "-activity").textContent 
+                = triggerCount + "...";
+
+            eventFunc(triggerCount);
+            triggerCount = 0;
+        }
+
 		/*
 		 * Compares to images.
 		 *
@@ -71,7 +84,6 @@
 
 			temp1Context.drawImage(image1, 0, 0, width, height);
 			temp2Context.drawImage(image2, 0, 0, width, height);
-            modecATriggered= false;
 
 			for(var y = 0; y < height; y++) {
 				for(var x = 0; x <  width; x++) {
@@ -82,16 +94,12 @@
 					var pixel2Data = pixel2.data;
 
 					if(comparePixel(pixel1Data, pixel2Data) == false) {
-                        modecATriggered = true;
+                        triggerCount++;
 						setTopLeft(x,y);
 						setBottomRight(x,y);
 					}					
 				}
 			}
-            if (modecATriggered) {
-                // when triggered,
-                console.log("triggered");
-            }
 
 			return {
 				'topLeft': topLeft,
@@ -166,7 +174,9 @@
 
 		// Return public interface.
 		return {
-			compare: compare
+			compare: compare,
+            setSensitivity: setSensitivity,
+            triggerFlush:  triggerFlush
 		}
 	};
 })(MotionDetector);

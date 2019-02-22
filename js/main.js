@@ -1,36 +1,60 @@
-var moDecCore = new MotionDetector.Core();
+var modecA;
+var modecB;
+
+function fuckChrome() {
+    defaultSensitivity = document.getElementById("modecA-sensitivity").value;
+    modecA = new MotionDetector.Core("A", "USB2.0 PC CAMERA (1908:2310)", 
+            defaultSensitivity, function(activityLevel) {
+                narrativeCore.enterMaze(activityLevel);
+            });
+}
+function fuckChromeHard() {
+    defaultSensitivity = document.getElementById("modecB-sensitivity").value;
+    modecB = new MotionDetector.Core("B", "FaceTime HD Camera", 
+            defaultSensitivity, function(activityLevel){
+                narrativeCore.enterGarden(activityLevel);
+            });
+}
 var narrativeCore = new Narrative.Core();
 
 let audioContext;
-let buffer;
+
+document.getElementById("modecA-sensitivity").oninput = function() {
+    document.getElementById("modecA-sensitivity-display").textContent = this.value;
+    modecA.setSensitivity(this.value);
+}
+document.getElementById("modecB-sensitivity").oninput = function() {
+    document.getElementById("modecB-sensitivity-display").textContent = this.value;
+    modecB.setSensitivity(this.value);
+}
 
 function initialize() {
     audioContext = new AudioContext();
     document.getElementById("init").value = "Initializing...";
-    // load audio
-    fetch('1.0.mp3') 
+    loadAudio("drone.mp3", buffer => { 
+        narrativeCore.droneLoaded(buffer);
+    });
+    loadAudio("pluck.mp3", buffer => { 
+        narrativeCore.pluckLoaded(buffer);
+    });
+}
+
+function loadAudio(name, bufferInserter) {
+    fetch(name) 
         .then(response => response.arrayBuffer()) // get buffer 
         .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer)) // decode data
         .then(audioBuffer => {  // store decoded buffer
             console.log('Decoded', audioBuffer);
-            //play(audioBuffer, 1, 1.002);
-            //play(audioBuffer, -1);
-           
-            // gotta rig up a switch that enables
-            // and disables. when modec signals,
-            // this needs to be faded in.
-            // after it's faded in, 
-            //play(audioBuffer);
-            buffer = audioBuffer;
-
-            document.getElementById("init").value = "Initialized.";
-            document.getElementById("init").disabled = "disabled";
+            bufferInserter(audioBuffer);
         }).catch(e => console.error(e));
 }
 
 function armMoDec(which) {
-
-    moDecCore.armMoDec();
+    if (which == "A") {
+        modecA.armMoDec();
+    } else { 
+        modecB.armMoDec(); 
+    }
     console.log("MoDec armed."); 
     document.getElementById("modec-" + which + "-status").textContent = "RUNNING...";
     document.getElementById("modec-" + which + "-status").style.color = "green";
@@ -38,7 +62,11 @@ function armMoDec(which) {
 }
 
 function disarmMoDec(which) {
-    moDecCore.disarmMoDec();
+    if (which == "A") {
+        modecA.disarmMoDec();
+    } else { 
+        modecB.disarmMoDec();
+    }
     console.log("MoDec disarmed."); 
     document.getElementById("modec-" + which + "-status").textContent = "NOT running";
     document.getElementById("modec-" + which + "-status").style.color = "red";

@@ -91,7 +91,6 @@
                         if (webCamWindow) {
                             var vendorURL = window.URL || window.webkitURL;
                             var videoTracks = localMediaStream.getVideoTracks();
-                            console.log(deviceName);
                             if (videoTracks[0].label == deviceName)  {
                                 console.log("match");
                                 if (navigator.mozGetUserMedia) {

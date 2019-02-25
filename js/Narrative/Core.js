@@ -13,7 +13,9 @@
         let bufferCount = 2;
 
         var droneNode;
+        var droneGain;
         var pluckNode;
+        var pluckGain;
 
         function markLoaded() {
             console.log((bufferCount - 1) + " buffers left to load...");
@@ -37,15 +39,14 @@
         function reset() {
             console.log("reset");
             // fade both out quickly
-            fadeout(droneNode);
-            fadeout(pluckNode);
+            fadeout(droneNode, droneGain);
+            fadeout(pluckNode, pluckGain);
             document.getElementById("1_trigger").disabled = false;
             document.getElementById("2_trigger").disabled = true;
             document.getElementById("3_trigger").disabled = true;
             document.getElementById("1_triggered").textContent=""
             document.getElementById("2_triggered").textContent=""
             document.getElementById("3_triggered").textContent=""
-            document.getElementById("4_triggered").textContent="✔"
         }
 
         function enterMaze(activity) {
@@ -64,8 +65,13 @@
                 console.log("Illegal state -- Buffers must be loaded first!");
                 return
             }
-            droneNode = play(droneBuffer);
-            pluckNode = play(pluckBuffer);
+            let droneNodes = play(droneBuffer);
+            let pluckNodes = play(pluckBuffer);
+
+            droneNode = droneNodes[0];
+            droneGain = droneNodes[1];
+            pluckNode = pluckNodes[0];
+            pluckGain = pluckNodes[1];
             document.getElementById("1_trigger").disabled = true;
             document.getElementById("2_trigger").disabled = false;
             document.getElementById("1_triggered").textContent="✔"
@@ -83,7 +89,7 @@
             // kill pluck, violently?
             console.log("Garden entry detected.");
 
-            fadeout(pluckNode);
+            fadeout(pluckNode, pluckGain);
 
             document.getElementById("3_trigger").disabled = false;
             document.getElementById("2_trigger").disabled = true;
@@ -93,30 +99,30 @@
         function exit() {
             // fade out drone
             console.log("exit");
-            fadeout(droneNode);
+            fadeout(droneNode, droneGain);
             document.getElementById("3_trigger").disabled = true;
             document.getElementById("1_trigger").disabled = false;
             document.getElementById("3_triggered").textContent="✔"
         }
 
-        function fadeout(node, duration=0) {
-            node.stop(audioContext.currentTime + 1);
+        function fadeout(node, gainNode, duration=0) {
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 10);
+            //node.stop(audioContext.currentTime + 1);
         }
 
         function play(buffer, panItup=0, rate=1) {
             let source = audioContext.createBufferSource();
             source.buffer = buffer;
-            source.loop = false;
-            //source.loopStart = 2;
-            //source.loopEnd = 3;
+            source.loop = true;
             source.playbackRate.value = rate;
 
-            let pannerNode = audioContext.createStereoPanner();
-            pannerNode.pan.value = panItup;
-            source.connect(pannerNode);
-            pannerNode.connect(audioContext.destination); 
-            source.start(0, 0);
-            return source;
+            let gainNode = audioContext.createGain();
+            gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            source.start(0, Math.random() * buffer.duration);
+            gainNode.gain.exponentialRampToValueAtTime(1 , audioContext.currentTime + 10);
+            return [source, gainNode];
         }
 
 		return {

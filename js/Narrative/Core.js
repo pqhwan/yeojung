@@ -17,12 +17,15 @@
         var pluckNode;
         var pluckGain;
 
+        var mazeActivityLevelThreshold = 300;
+        var gardenActivityLevelThreshold = 300;
+
         function markLoaded() {
             console.log((bufferCount - 1) + " buffers left to load...");
             if (--bufferCount == 0) {
                 document.getElementById("init").value = "Initialized.";
                 document.getElementById("init").disabled = true;
-                document.getElementById("1_trigger").disabled = false;
+                enable("start", true);
             }
         }
 
@@ -36,48 +39,121 @@
             markLoaded(); 
         }
 
-        function reset() {
-            console.log("reset");
-            // fade both out quickly
-            fadeout(droneNode, droneGain);
-            fadeout(pluckNode, pluckGain);
-            document.getElementById("1_trigger").disabled = false;
-            document.getElementById("2_trigger").disabled = true;
-            document.getElementById("3_trigger").disabled = true;
-            document.getElementById("1_triggered").textContent=""
-            document.getElementById("2_triggered").textContent=""
-            document.getElementById("3_triggered").textContent=""
+        function kill() {
+            console.log("narrative offline");
+
+            if (!isEnabled('kill')) {
+                return;
+            }
+
+            if (droneNode) {
+                fadeout(droneNode, droneGain);
+            } else {
+                console.log("drone not playing.")
+            }
+
+            if (pluckNode) {
+                fadeout(pluckNode, pluckGain);
+            } else {
+                console.log("pluck not playing.")
+            }
+
+            enable("start", true);
+            enable("enter-maze",false);
+            enable("enter-garden", false);
+            enable("kill", false);
+            markTriggered('kill');
+        }
+
+        function start() {
+            console.log("narrative online");
+
+            if (!isEnabled('start')) {
+                return;
+            }
+
+            if (!droneBuffer) {
+                console.log("illegal state - drone buffer not loaded");
+                return;
+            }
+            let droneNodes = play(droneBuffer, 0.2);
+            droneNode = droneNodes[0];
+            droneGain = droneNodes[1];
+
+            enable("kill", true);
+            enable('enter-maze', true);
+            enable('start', false);
+            markTriggered('start');
         }
 
         function enterMaze(activity) {
+            if (activity == 0 || activity < mazeActivityLevelThreshold) {
+                return
+            }
+
+            if (!isEnabled('enter-maze')) {
+                return;
+            }
+
+            console.log("maze entry triggered");
+
+            if (!pluckBuffer) {
+                console.log("illegal state - pluck buffer not loaded");
+                return
+            }
+
+            let pluckNodes = play(pluckBuffer, 0.8);
+
+            pluckNode = pluckNodes[0];
+            pluckGain = pluckNodes[1];
+
+            enable('enter-maze', false);
+            enable('enter-garden', true);
+            enable('start', false);
+            markTriggered('enter-maze');
+        }
+
+        function enterGarden(activity) {
+            if (activity == 0 || activity < gardenActivityLevelThreshold) {
+                return
+            }
+            if (!isEnabled('enter-garden')) {
+                return;
+            }
+
+            console.log("garden entry triggered");
+
+            fadeout(pluckNode, pluckGain);
+
+            enable('enter-garden', false);
+            enable('enter-maze', true);
+            markTriggered('enter-garden');
+        }
+
+        function enterMazes(activity) {
             if (activity == 0 || activity < 300) {
                 return
             }
 
-            if (document.getElementById("1_trigger").disabled) {
-                console.log("Event disabled.");
+            if (document.getElementById("enter-maze-trigger").disabled) {
+                console.log("maze entry trigger disabled.");
                 return
             }
+            document.getElementById("enter-maze-trigger").disabled = true;
 
-            // start both 
             console.log("Maze entry detected.");
-            if (!droneBuffer || !pluckBuffer) {
-                console.log("Illegal state -- Buffers must be loaded first!");
+            if (!pluckBuffer) {
+                console.log("Illegal state -- pluck buffer not loaded");
                 return
             }
-            let droneNodes = play(droneBuffer);
             let pluckNodes = play(pluckBuffer);
 
-            droneNode = droneNodes[0];
-            droneGain = droneNodes[1];
             pluckNode = pluckNodes[0];
             pluckGain = pluckNodes[1];
-            document.getElementById("1_trigger").disabled = true;
-            document.getElementById("2_trigger").disabled = false;
-            document.getElementById("1_triggered").textContent="✔"
+            document.getElementById("enter-garden-trigger").disabled = false;
         }
 
-        function enterGarden(activity) {
+        function enterGardens(activity) {
             if (activity == 0 || activity < 300) {
                 return
             }
@@ -110,28 +186,53 @@
             //node.stop(audioContext.currentTime + 1);
         }
 
-        function play(buffer, panItup=0, rate=1) {
+        function play(buffer, gain=1) {
             let source = audioContext.createBufferSource();
             source.buffer = buffer;
             source.loop = true;
-            source.playbackRate.value = rate;
 
             let gainNode = audioContext.createGain();
             gainNode.gain.setValueAtTime(0.01, audioContext.currentTime);
             source.connect(gainNode);
             gainNode.connect(audioContext.destination);
             source.start(0, Math.random() * buffer.duration);
-            gainNode.gain.exponentialRampToValueAtTime(1 , audioContext.currentTime + 10);
+            gainNode.gain.exponentialRampToValueAtTime(gain, audioContext.currentTime + 10);
             return [source, gainNode];
+        }
+
+        function enable(eventName, enabled) {
+            document.getElementById(eventName + "-trigger").disabled = !enabled;
+        }
+
+        function isEnabled(eventName) {
+            return !document.getElementById(eventName + "-trigger").disabled;
+        }
+
+        function setMazeActivityLevelThreshold(threshold) {
+            mazeActivityLevelThreshold = threshold;
+        }
+
+        function setGardenActivityLevelThreshold(threshold) {
+            gardenActivityLevelThreshold = threshold;
+        }
+
+        function markTriggered(eventName) {
+            document.getElementById("kill-triggered").textContent=""
+            document.getElementById("start-triggered").textContent=""
+            document.getElementById("enter-maze-triggered").textContent=""
+            document.getElementById("enter-garden-triggered").textContent=""
+            document.getElementById(eventName + "-triggered").textContent="✔"
         }
 
 		return {
             droneLoaded: droneLoaded,
             pluckLoaded: pluckLoaded,
-		    reset : reset,
+		    kill: kill,
+            start: start,
             enterMaze: enterMaze,
             enterGarden: enterGarden,
-            exit: exit
+            setGardenActivityLevelThreshold, setGardenActivityLevelThreshold,
+            setMazeActivityLevelThreshold, setMazeActivityLevelThreshold
 		}
 	};
 })(Narrative);

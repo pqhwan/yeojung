@@ -22,16 +22,32 @@
                 <td style="position:relative;">
                     <video id="webCamA" autoplay></video>
                     <div id="movementA"></div>
-                    <input type="button" class="btn btn-danger" value="start webcam capture" onclick="fuckChrome();">
+                    <input type="button" class="btn btn-primary" value="start webcam capture" onclick="fuckChrome();">
                 </td>
                 <td style="position:relative;">
                     <video id="webCamB" autoplay></video>
                     <div id="movementB"></div>
-                    <input type="button" class="btn btn-danger" value="start webcam capture" onclick="fuckChromeHard();">
+                    <input type="button" class="btn btn-primary" value="start webcam capture" onclick="fuckChromeHard();">
                 </td>
             </tr>
             <tr>
-                <td><h2>Sensitivity</h2></td>
+                <td><h2>Status</h2></td>
+                <td><h2 id="modec-A-status" style="color: red;">NOT running</h2></td>
+                <td><h2 id="modec-B-status" style="color: red;">NOT running</h2></td>
+            </tr>
+            <tr>
+                <td><h2>On/Off Controls</h2></td>
+                <td>
+                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('A');">
+                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('A');">
+                </td>
+                <td>
+                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('B');">
+                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('B');">
+                </td>
+            </tr>
+            <tr>
+                <td><h2>Sensitivity Controls</h2></td>
                 <td>
                     <input type="range" min="1" max="200" value="70" class="slider" id="modecA-sensitivity"> 
                     <h2 id="modecA-sensitivity-display">70</h2>
@@ -42,25 +58,20 @@
                 </td>
             </tr>
             <tr>
-                <td><h2>Status</h2></td>
-                <td><h2 id="modec-A-status" style="color: red;">NOT running</h2></td>
-                <td><h2 id="modec-B-status" style="color: red;">NOT running</h2></td>
+                <td><h2>Activity Level Threshold Controls</h2></td>
+                <td>
+                    <input type="range" min="1" max="1000" value="300" class="slider" id="modecA-activitylevel-threshold"> 
+                    <h2 id="modecA-activitylevel-threshold-display">300</h2>
+                </td>
+                <td>
+                    <input type="range" min="1" max="1000" value="300" class="slider" id="modecB-activitylevel-threshold">
+                    <h2 id="modecB-activitylevel-threshold-display">300</h2>
+                </td>
             </tr>
             <tr>
-                <td><h2>Activity Level (measured every 2.5sec)</h2></td>
+                <td><h2>Activity Level Measurement (per 2.5s)</h2></td>
                 <td><h2 id="modec-A-activity" style="color: blue;">NOT measuring</h2></td>
                 <td><h2 id="modec-B-activity" style="color: blue;">NOT measuring</h2></td>
-            </tr>
-            <tr>
-                <td><h2>Controls</h2></td>
-                <td>
-                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('A');">
-                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('A');">
-                </td>
-                <td>
-                    <input type="button" class="btn btn-success" value="START Motion Detection" onclick="armMoDec('B');">
-                    <input type="button" class="btn btn-danger" value="STOP Motion Detection" onclick="disarmMoDec('B');">
-                </td>
             </tr>
         </table>
 
@@ -71,31 +82,31 @@
         <table id="panel" class="table table-hover table-bordered">
             <tr>
                 <td><h4>STAGE</h4></td>
-                <td><h4>0: No visitor</h4></td>
-                <td><h4>1: Visitor enters MAZE, track fades in</h4></td>
-                <td><h4>2: Visitor enters GARDEN, pluck fades out</h4></td>
-                <td><h4>3: Visitor EXITS, drone fades out</h4></td>
+                <td><h4>0: Narrative offline</h4></td>
+                <td><h4>1: Narrative online, drone plays</h4></td>
+                <td><h4>2: Visitor enters MAZE, pluck fades in (Modec A)</h4></td>
+                <td><h4>3: Visitor enters GARDEN, pluck fades out (Modec B)</h4></td>
             </tr>
             <tr>
                 <td><h4>Event triggered</h4></td>
-                <td id="0_triggered">✔</td>
-                <td id="1_triggered"></td>
-                <td id="2_triggered"></td>
-                <td id="3_triggered"></td>
+                <td id="kill-triggered">✔</td>
+                <td id="start-triggered"></td>
+                <td id="enter-maze-triggered"></td>
+                <td id="enter-garden-triggered"></td>
             </tr>
             <tr>
                 <td><h4>Manual Triggers</h4></td>
                 <td id="0_manual">
-                    <input id="0_trigger" type="button" class="btn btn-danger" value="RESET" onclick="narrativeCore.reset();">
+                    <input id="kill-trigger" type="button" disabled="true" class="btn btn-danger" value="STOP NARRATIVE" onclick="narrativeCore.kill();">
                 </td>
                 <td id="1_manual">
-                    <input id="1_trigger" type="button" disabled="disabled" class="btn btn-warning" value="TRIGGER" onclick="narrativeCore.enterMaze();">
+                    <input id="start-trigger" type="button" disabled="true" class="btn btn-primary" value="START NARRATIVE" onclick="narrativeCore.start();">
                 </td>
                 <td id="2_manual">
-                    <input id="2_trigger" type="button" disabled="disabled" class="btn btn-warning" value="TRIGGER" onclick="narrativeCore.enterGarden();">
+                    <input id="enter-maze-trigger" type="button" disabled="true" class="btn btn-warning" value="TRIGGER MAZE ENTRY" onclick="narrativeCore.enterMaze();">
                 </td>
                 <td id="3_manual">
-                    <input id="3_trigger" type="button" disabled="disabled" class="btn btn-warning" value="TRIGGER" onclick="narrativeCore.exit();">
+                    <input id="enter-garden-trigger" type="button" disabled="true" class="btn btn-warning" value="TRIGGER GARDEN ENTRY" onclick="narrativeCore.enterGarden();">
                 </td>
             </tr>
         </table>

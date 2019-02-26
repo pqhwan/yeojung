@@ -3,14 +3,14 @@ var modecB;
 
 function fuckChrome() {
     defaultSensitivity = document.getElementById("modecA-sensitivity").value;
-    modecA = new MotionDetector.Core("A", "USB2.0 PC CAMERA (1908:2311)", 
+    modecA = new MotionDetector.Core("A", "FaceTime HD Camera", 
             defaultSensitivity, function(activityLevel) {
                 narrativeCore.enterMaze(activityLevel);
             });
 }
 function fuckChromeHard() {
     defaultSensitivity = document.getElementById("modecB-sensitivity").value;
-    modecB = new MotionDetector.Core("B", "USB2.0 PC CAMERA #2 (1908:2310)", 
+    modecB = new MotionDetector.Core("B", "USB2.0 PC CAMERA (1908:2310)", 
             defaultSensitivity, function(activityLevel){
                 narrativeCore.enterGarden(activityLevel);
             });
@@ -26,6 +26,15 @@ document.getElementById("modecA-sensitivity").oninput = function() {
 document.getElementById("modecB-sensitivity").oninput = function() {
     document.getElementById("modecB-sensitivity-display").textContent = this.value;
     modecB.setSensitivity(this.value);
+}
+
+document.getElementById("modecA-activitylevel-threshold").oninput = function() {
+    document.getElementById("modecA-activitylevel-threshold-display").textContent = this.value;
+    narrativeCore.setMazeActivityLevelThreshold(this.value);
+}
+document.getElementById("modecB-activitylevel-threshold").oninput = function() {
+    document.getElementById("modecB-activitylevel-threshold-display").textContent = this.value;
+    modecB.setGardenActivityLevelThreshold(this.value);
 }
 
 function initialize() {

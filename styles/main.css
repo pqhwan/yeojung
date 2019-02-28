@@ -28,6 +28,10 @@
 input[type="button"] {
 }
 
+input[type="textarea"] {
+width:100%
+}
+
 .running{
     animation:blinkingText 2s infinite;
 }

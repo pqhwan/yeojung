@@ -3,14 +3,14 @@ var modecB;
 
 function fuckChrome() {
     defaultSensitivity = document.getElementById("modecA-sensitivity").value;
-    modecA = new MotionDetector.Core("A", "USB2.0 PC CAMERA #2 (1908:2310)", 
+    modecA = new MotionDetector.Core("A", "USB2.0 PC CAMERA #5 (1908:2310)", 
             defaultSensitivity, function(activityLevel) {
                 narrativeCore.enterMaze(activityLevel);
             });
 }
 function fuckChromeHard() {
     defaultSensitivity = document.getElementById("modecB-sensitivity").value;
-    modecB = new MotionDetector.Core("B", "USB2.0 PC CAMERA (1908:2311)", 
+    modecB = new MotionDetector.Core("B", "USB2.0 PC CAMERA #6 (1908:2311)", 
             defaultSensitivity, function(activityLevel){
                 narrativeCore.enterGarden(activityLevel);
             });

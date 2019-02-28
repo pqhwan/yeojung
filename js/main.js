@@ -3,7 +3,7 @@ var modecB;
 
 function fuckChrome() {
     defaultSensitivity = document.getElementById("modecA-sensitivity").value;
-    modecA = new MotionDetector.Core("A", "USB2.0 PC Camera #2 (1908:2310)", 
+    modecA = new MotionDetector.Core("A", "USB2.0 PC CAMERA #2 (1908:2310)", 
             defaultSensitivity, function(activityLevel) {
                 narrativeCore.enterMaze(activityLevel);
             });

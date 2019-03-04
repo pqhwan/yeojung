@@ -76,7 +76,7 @@
                 console.log("illegal state - drone buffer not loaded");
                 return;
             }
-            let droneNodes = play(droneBuffer, 0.2);
+            let droneNodes = play(droneBuffer, 0.4);
             droneNode = droneNodes[0];
             droneGain = droneNodes[1];
 
